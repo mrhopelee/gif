@@ -1,5 +1,6 @@
 var fs = require("fs");
-var singleframe = require("./singleframe"), gm = require('gm').subClass({imageMagick: true});
+var singleframe = require("./singleframe"),
+    gm = require('gm').subClass({imageMagick: true});
 
 //异步读取文件并获取gif格式的图片信息
 /* fs.readFile('gifimg/mao.gif', function(err, data) {
@@ -21,13 +22,14 @@ if(params[0]) {
     console.log("进入文件目录："+params[0]);
     fs.readdir(params[0],function(err, files){
         if (err) {
+            console.log("找不到文件目录："+params[0]);
             return console.error(err);
         }
         console.log("读取对应目录中的所有文件");
         files.forEach( function (file){
             
             //gmSingle(file);
-            mySingle(file);
+            mySingle(params[0],file);
                                   
         });
     }); 
@@ -44,9 +46,9 @@ function gmSingle(file){
             });        
 }
 
-function mySingle(file){
+function mySingle(dir,file){
     var buf = new Buffer(1024);
-            fs.open('gifimg/'+file, 'r+', function(err, fd) {
+            fs.open(dir+'/'+file, 'r+', function(err, fd) {
                if (err) {
                    return console.error(err);
                }
@@ -58,14 +60,24 @@ function mySingle(file){
                   console.log("文件打开成功！");
                   console.log("正在读取"+file.toString());
                   info = singleframe(buf);
-                  if(info){
-                      console.log("Data is type:", info.mimeType);
+                  if(info.isSingle===-1){
+                      /*console.log("Data is type:", info.mimeType);
                       console.log("  Size:", buf.length, "bytes");
                       console.log("  Dimensions:", info.width, "x", info.height);
                       console.log("  NotSingle:", info.isSingle);
-                      console.log("  SorM:", info.SorM);
+                      console.log("  SorM:", info.SorM);*/
+
+                      gm(file)
+                          .convert('JPEG')
+                          .write("optimg/"+file, function(err, value) {
+                              if (!err) {
+                                  console.log("dist.jpg 写入成功");
+                              } else {
+                                  console.log(err);
+                              }
+                          });
                   }else {
-                      console.log("format not gif");
+                      console.log("图片为多帧gif动画");
                   }
                   console.log(bytes + "  字节被读取");
                   console.log("读取"+file+"完毕\n");

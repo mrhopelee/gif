@@ -75,7 +75,11 @@ function checkSig(buffer, offset, sig) {
 module.exports = function singleframe(buffer, path) {
     var gifSig = [0x47, 0x49, 0x46, 0x38, [0x37, 0x39], 0x61];
 
-    if (checkSig(buffer, 0, gifSig)) return imageInfoGif(buffer);
+    if (checkSig(buffer, 0, gifSig)) {
+        return imageInfoGif(buffer);
+    }else {
+        console.log("图片不是gif格式");
+    }
 
     return false;
 };
